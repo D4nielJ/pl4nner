@@ -28,16 +28,18 @@ enum taskStatus {
 }
 
 model Project {
-  id      String   @id @default(uuid())
-  name    String   @db.VarChar(255)
-  columns Column[]
-  tasks   Task[]
+  id         String   @id @default(uuid())
+  name       String   @db.VarChar(255)
+  order      Int      @default(autoincrement())
+  columns    Column[]
+  tasks      Task[]
+  isArchived Boolean  @default(false)
 }
 
 model Column {
   id        String     @id @default(uuid())
   name      String     @db.VarChar(255)
-  order     Int
+  order     Int        @default(autoincrement())
   status    taskStatus
   project   Project    @relation(fields: [projectId], references: [id])
   projectId String
@@ -48,7 +50,7 @@ model Task {
   id          String       @id @default(uuid())
   name        String       @db.VarChar(255)
   description String?
-  order       Int
+  order       Int          @default(autoincrement())
   priority    taskPriority @default(MEDIUM)
   status      taskStatus   @default(TODO)
   column      Column       @relation(fields: [columnId], references: [id])

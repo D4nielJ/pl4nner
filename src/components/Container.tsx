@@ -6,7 +6,9 @@ export default function Container({
   children: any;
 }) {
   return (
-    <div class={`container max-w-4xl mx-auto px-4 ${className}`}>
+    <div
+      class={`container max-w-4xl mx-auto px-4 bg-zinc-950 text-white ${className}`}
+    >
       {children}
     </div>
   );

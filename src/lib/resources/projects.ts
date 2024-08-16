@@ -1,18 +1,34 @@
 import { action, cache, redirect, reload } from "@solidjs/router";
 import { db } from "../db";
-import { Column, taskStatus, taskStatus as type } from "@prisma/client";
+import { taskStatus, taskStatus as type } from "@prisma/client";
 
 export const getProjects = cache(async () => {
   "use server";
   try {
     const projects = await db.project.findMany({
       include: { columns: true, tasks: true },
+      where: { isArchived: false },
     });
     return projects;
   } catch {
     console.log("500 error getting projects");
+    redirect("/error");
   }
 }, "projects");
+
+export const getArchivedProjects = cache(async () => {
+  "use server";
+  try {
+    const projects = await db.project.findMany({
+      include: { columns: true, tasks: true },
+      where: { isArchived: true },
+    });
+    return projects;
+  } catch {
+    console.log("500 error getting archived projects");
+    redirect("/error");
+  }
+}, "archivedProjects");
 
 export const addProject = action(async (formData: FormData) => {
   "use server";
@@ -58,10 +74,29 @@ export const addProject = action(async (formData: FormData) => {
   }
 });
 
-export const updateProject = action(async (id: string, name: string) => {
+export const updateProject = action(async (formData: FormData, id: string) => {
   "use server";
+  const project = await db.project.findUnique({ where: { id } });
+  const name = String(formData.get("name")) || project?.name;
+  const isArchived = Boolean(formData.get("isArchived")) || project?.isArchived;
+  const order = Number(formData.get("order")) || project?.order;
+
   try {
-    await db.project.update({ where: { id }, data: { name } });
+    await db.project.update({
+      where: { id },
+      data: { name, isArchived, order },
+    });
+  } catch (err) {
+    console.log(err);
+    throw redirect("/error");
+  }
+});
+
+export const archiveProject = action(async (formData: { id: string }) => {
+  "use server";
+  const id = formData.id;
+  try {
+    await db.project.update({ where: { id }, data: { isArchived: true } });
   } catch (err) {
     console.log(err);
     throw redirect("/error");
