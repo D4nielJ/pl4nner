@@ -1,4 +1,3 @@
-import { taskStatus } from "@prisma/client";
 import {
   createAsync,
   type RouteDefinition,
@@ -6,11 +5,11 @@ import {
 } from "@solidjs/router";
 import { createSignal, For, Show } from "solid-js";
 import Container from "~/components/Container";
-import {
-  getProjects,
-  addProject,
-  archiveProject,
-} from "~/lib/resources/projects";
+import H2 from "~/components/elements/H2";
+import ProjectCard from "~/components/ProjectCard";
+import { getProjects, addProject } from "~/lib/resources/projects";
+import SearchBar from "~/components/elements/SearchBar";
+import Button from "~/components/elements/Button";
 
 export const route = {
   preload() {
@@ -30,69 +29,33 @@ export default function Home(props: RouteSectionProps) {
   let inputRef!: HTMLInputElement;
   return (
     <Container className="pt-12 pb-12">
-      <h2 class="text-4xl font-bold mb-6">Projects</h2>
-      <div class="mb-6 flex">
-        <input
-          type="text"
-          class="flex-grow px-3 py-1.5 rounded-md mr-6 text-zinc-800 placeholder:text-zinc-500"
-          placeholder="Search"
-        />
-        <button
-          class="border-2 border-zinc-800 px-3 py-1.5 rounded-md"
-          onClick={() => setIsModelShown(true)}
-        >
-          New project
-        </button>
+      <H2>Projects</H2>
+      <div class="flex mb-6">
+        <SearchBar className="flex-grow" />
+        <Button onClick={() => setIsModelShown(true)}>New project</Button>
       </div>
       <ul class="grid grid-cols-3 gap-6">
         <For each={projects()}>
-          {(p) => (
-            <form
-              method="post"
-              class="relative p-6 rounded-xl bg-zinc-900 mb-6 h-full"
-            >
-              <li>
-                <h3 class="text-xl -ml-1 font-bold text-zinc-300 mb-3">
-                  {p.name}
-                </h3>
-                <span>Pending tasks: </span>
-                <For each={p.tasks}>
-                  {(t) => {
-                    if (t.status === taskStatus.TODO) {
-                      return <div> - {t.name}</div>;
-                    }
-                  }}
-                </For>
-                <button
-                  formAction={archiveProject.with({
-                    id: p.id,
-                  })}
-                  class="absolute text-xs top-3 right-3 border-2 border-zinc-800 px-2 py-1 rounded-md"
-                >
-                  X
-                </button>
-              </li>
-            </form>
-          )}
+          {(p) => <ProjectCard id={p.id} name={p.name} tasks={p.tasks} />}
         </For>
       </ul>
 
       <Show when={isModelShown()}>
         <div
-          class="absolute top-0 bottom-0 left-0 right-0 bg-zinc-950 opacity-80"
+          class="absolute top-0 right-0 bottom-0 left-0 bg-zinc-950 opacity-80"
           onClick={() => setIsModelShown(false)}
         />
         <form
           method="post"
           action={addProject}
-          class="absolute top-0 bottom-0 right-0 bg-zinc-900 flex flex-col pt-40 px-10 opacity-100"
+          class="absolute top-0 right-0 bottom-0 flex flex-col px-10 pt-40 bg-zinc-900 opacity-100"
           onSubmit={(e) => {
             if (!name().trim()) e.preventDefault();
             setIsModelShown(false);
             setName("");
           }}
         >
-          <h2 class="text-2xl font-bold mb-6">Create new project</h2>
+          <h2 class="mb-6 text-2xl font-bold">Create new project</h2>
           <input
             name="name"
             class="px-3 py-1.5 rounded-md text-zinc-800 placeholder:text-zinc-500 mb-6 w-96 w-"

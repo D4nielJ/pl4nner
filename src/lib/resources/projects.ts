@@ -2,6 +2,20 @@ import { action, cache, redirect, reload } from "@solidjs/router";
 import { db } from "../db";
 import { taskStatus, taskStatus as type } from "@prisma/client";
 
+export const getProject = cache(async (id: string) => {
+  "use server";
+  try {
+    const project = await db.project.findUnique({
+      where: { id },
+      include: { columns: true, tasks: true },
+    });
+    return project;
+  } catch {
+    console.log("500 error getting project");
+    redirect("/error");
+  }
+}, "project");
+
 export const getProjects = cache(async () => {
   "use server";
   try {

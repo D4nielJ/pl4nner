@@ -10,7 +10,7 @@ export default function Nav() {
   return (
     <nav class="border-b-2 border-b-zinc-800">
       <Container>
-        <ul class="container flex items-center py-3 text-gray-200">
+        <ul class="container flex items-center px-12 py-3 text-gray-200">
           <li
             class={`border-b-2 border-b-zinc-400 ${active("/")} mr-3 sm:mr-12`}
           >

@@ -41,7 +41,7 @@ model Column {
   name      String     @db.VarChar(255)
   order     Int        @default(autoincrement())
   status    taskStatus
-  project   Project    @relation(fields: [projectId], references: [id])
+  project   Project    @relation(fields: [projectId], references: [id], onUpdate: Cascade, onDelete: Cascade)
   projectId String
   tasks     Task[]
 }
@@ -53,8 +53,8 @@ model Task {
   order       Int          @default(autoincrement())
   priority    taskPriority @default(MEDIUM)
   status      taskStatus   @default(TODO)
-  column      Column       @relation(fields: [columnId], references: [id])
+  column      Column       @relation(fields: [columnId], references: [id], onUpdate: Cascade, onDelete: Cascade)
   columnId    String
-  project     Project      @relation(fields: [projectId], references: [id])
+  project     Project      @relation(fields: [projectId], references: [id], onUpdate: Cascade, onDelete: Cascade)
   projectId   String
 }
